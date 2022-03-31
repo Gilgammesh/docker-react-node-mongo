@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  mongo:
+    container_name: mongo
+    image: mongo:4-focal
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+    expose:
+      - "27017"
+  backend:
+    container_name: backend
+    image: backend
+    build: ./backend
+    ports:
+      - 4000:4000
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    restart: always
+    environment:
+      - MONGO_URL=mongo
+  frontend:
+    container_name: frontend
+    image: frontend
+    build: ./frontend
+    ports:
+      - 80:80
+    links:
+      - backend
+    depends_on:
+      - backend
+    restart: always
+    environment:
+      - API_URL=backend
+volumes:
+  mongo-data: {}  
